@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - BETX</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0a1a2f;
+      color: #fff;
+    }
+    .login-container, .dashboard {
+      display: none;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .login-container.active, .dashboard.active {
+      display: flex;
+    }
+    .card {
+      background: #112b4a;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+    }
+    button {
+      width: 95%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-green { background: #28a745; }
+    .btn-orange { background: #ff8800; }
+    .btn-grey { background: #333; }
+    .balance-card {
+      background: #007bff;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+      color: #fff;
+      font-size: 22px;
+      position: relative;
+    }
+    .balance-card small {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .header {
+      width: 100%;
+      text-align: center;
+      padding: 15px;
+      background: #0f2442;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div class="login-container active" id="loginPage">
+    <div class="card">
+      <h2>Admin Login</h2>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button class="btn-green" onclick="login()">Login</button>
+      <p id="loginError" style="color:red; display:none;">Invalid credentials</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboardPage">
+    <div class="header">My Account</div>
+    <div class="card">
+      <p>EPOS Nº <span id="epos">-Don ❤️</span></p>
+      <p>Location: NEPAL 🇳🇵</p>
+      <div class="balance-card">
+        <div>Balance: <span id="adminBalance">0</span> NPR</div>
+        <small>(Admin Wallet)</small>
+      </div>
+
+      <h3>Top up Player</h3>
+      <input type="text" id="playerAccount" placeholder="Player Account Nº">
+      <input type="number" id="depositAmount" placeholder="Deposit Amount">
+      <button class="btn-green" onclick="deposit()">Top up account</button>
+      
+      <button class="btn-orange" disabled>Withdraw funds (Coming soon)</button>
+      <button class="btn-grey" onclick="logout()">LOG OUT</button>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+  <script>
+    // Firebase config (saved in my memory for you)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCv3gDLEUhuHdMDPc2RX2AzLvihDfmEXgo",
+      authDomain: "betx-74dff.firebaseapp.com",
+      projectId: "betx-74dff",
+      storageBucket: "betx-74dff.firebasestorage.app",
+      messagingSenderId: "85279852822",
+      appId: "1:85279852822:web:91ef8dad8794d820416837",
+      measurementId: "G-NX5D0BF329"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let adminDocRef = db.collection("admins").doc("Don");
+
+    // Login
+    function login(){
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if(user === "Don" && pass === "000"){
+        document.getElementById("loginPage").classList.remove("active");
+        document.getElementById("dashboardPage").classList.add("active");
+        listenAdminBalance();
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
+    }
+
+    function logout(){
+      document.getElementById("dashboardPage").classList.remove("active");
+      document.getElementById("loginPage").classList.add("active");
+    }
+
+    // Realtime admin balance
+    function listenAdminBalance(){
+      adminDocRef.onSnapshot(doc=>{
+        if(doc.exists){
+          document.getElementById("adminBalance").innerText = doc.data().balance;
+        }
+      });
+    }
+
+    // Deposit to player
+    async function deposit(){
+      const playerAcc = document.getElementById("playerAccount").value.trim();
+      const amount = parseFloat(document.getElementById("depositAmount").value);
+
+      if(!playerAcc || !amount || amount <= 0){
+        alert("Enter valid account number and amount.");
+        return;
+      }
+
+      const adminDoc = await adminDocRef.get();
+      if(!adminDoc.exists){
+        alert("Admin account not found!");
+        return;
+      }
+
+      let adminBalance = adminDoc.data().balance;
+      if(amount > adminBalance){
+        alert("Insufficient admin balance.");
+        return;
+      }
+
+      // Deduct from admin
+      await adminDocRef.update({
+        balance: adminBalance - amount
+      });
+
+      // Add to player
+      const playerRef = db.collection("users").doc(playerAcc);
+      const playerDoc = await playerRef.get();
+      if(playerDoc.exists){
+        let currentBalance = playerDoc.data().balance || 0;
+        await playerRef.update({
+          balance: currentBalance + amount
+        });
+      } else {
+        // If player doesn't exist yet
+        await playerRef.set({ balance: amount });
+      }
+
+      alert("Deposit successful!");
+      document.getElementById("depositAmount").value = "";
+      document.getElementById("playerAccount").value = "";
+    }
+  </script>
+</body>
+</html>
