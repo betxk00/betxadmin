@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Betz Casino</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a192f, #172a45);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #e6f1ff;
+      overflow: hidden;
+      position: relative;
+      padding: 0;
+    }
+
+    /* Decorative elements for casino vibe */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 3s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+
+    .container {
+      width: 92%;
+      max-width: 420px;
+      background: rgba(15, 25, 47, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 28px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                  0 0 40px rgba(0, 187, 255, 0.15);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(0, 187, 255, 0.1);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .header {
+      text-align: center;
+      padding: 35px 25px 20px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #00bfff, #0077cc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 187, 255, 0.3);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      position: relative;
+    }
+
+    .header h1::after {
+      content: '🎰';
+      position: absolute;
+      right: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2.2rem;
+      animation: spin 4s infinite linear;
+    }
+
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: #a0c8ff;
+      margin-top: -5px;
+      opacity: 0.9;
+    }
+
+    .form-container {
+      padding: 0 30px 35px;
+      position: relative;
+    }
+
+    .input-group {
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 16px 18px;
+      border: none;
+      background: #0f172a;
+      border-radius: 12px;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+      border: 1px solid #1e293b;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-group input:focus {
+      box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.25), 
+                  0 2px 10px rgba(0, 187, 255, 0.15);
+      transform: translateY(-2px);
+      border-color: #00bfff;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #00bfff, #0077cc);
+      color: black;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 15px rgba(0, 187, 255, 0.3);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 187, 255, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .toggle-btn {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    .toggle-btn a {
+      color: #00bfff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .toggle-btn a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .social-login {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .social-login span {
+      margin: 0 8px;
+    }
+
+    .social-login button {
+      width: 48px;
+      height: 48px;
+      border: none;
+      background: #0f172a;
+      border-radius: 50%;
+      margin: 0 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      color: #94a3b8;
+      font-size: 1.1rem;
+      border: 1px solid #1e293b;
+    }
+
+    .social-login button:hover {
+      background: #00bfff;
+      color: black;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 187, 255, 0.4);
+    }
+
+    .left-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(135deg, #00bfff, #0077cc);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 30px;
+      z-index: 1;
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 4s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.3); opacity: 0.2; }
+      100% { transform: scale(1); opacity: 0.6; }
+    }
+
+    .title {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: 0 0 20px rgba(0, 187, 255, 0.5);
+      letter-spacing: -1px;
+      position: relative;
+    }
+
+    .title::after {
+      content: '🎰';
+      position: absolute;
+      right: -35px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2.4rem;
+      animation: spin 4s infinite linear;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 220px;
+      position: relative;
+    }
+
+    .switch-form {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      background: #00bfff;
+      border-radius: 50%;
+      z-index: 3;
+      transition: all 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 187, 255, 0.3);
+    }
+
+    .switch-form::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.4s ease;
+      transform-origin: center;
+    }
+
+    .switch-form.active {
+      background: #0f172a;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.5);
+    }
+
+    .switch-form.active::before {
+      transform: rotate(180deg) scale(0.8);
+      background: #00bfff;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .animate-left {
+      animation: slideInLeft 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    .animate-right {
+      animation: slideInRight 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 420px) {
+      .title { font-size: 2.4rem; }
+      .header h1 { font-size: 2.3rem; }
+      .container { width: 95%; }
+    }
+
+    /* Hide scrollbars */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Decorative stars -->
+  <div class="stars" id="stars"></div>
+
+  <div class="container">
+    <!-- Left Panel: Welcome Screen -->
+    <div class="left-panel animate-left">
+      <div class="title">Betz Casino</div>
+      <div class="subtitle">Where Luck Meets Luxury — Play Now, Win Big!</div>
+      <div class="switch-form" onclick="toggleForm()"></div>
+    </div>
+
+    <!-- Right Panel: Form -->
+    <div class="right-panel animate-right">
+      <div class="form-container">
+        <div class="header">
+          <h1>Login</h1>
+          <p>Enter your credentials to access your account</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="input-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn" onclick="login()">Login</button>
+          <div class="toggle-btn">
+            Don’t have an account? <a href="#" onclick="toggleForm()">Register</a>
+          </div>
+          <div class="social-login">
+            Or login with:
+            <span>
+              <button type="button"><i>g</i></button>
+              <button type="button"><i>f</i></button>
+              <button type="button"><i>i</i></button>
+            </span>
+          </div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" style="display: none;">
+          <div class="input-group">
+            <label for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+          <div class="input-group">
+            <label for="reg-password">Create Password</label>
+            <input type="password" id="reg-password" placeholder="••••••••" required autocomplete="new-password" />
+          </div>
+          <button type="submit" class="btn" onclick="register()">Register</button>
+          <div class="toggle-btn">
+            Already have an account? <a href="#" onclick="toggleForm()">Login</a>
+          </div>
+          <div class="social-login">
+            Or register with:
+            <span>
+              <button type="button"><i>g</i></button>
+              <button type="button"><i>f</i></button>
+              <button type="button"><i>i</i></button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+
+  <script>
+    // 🔐 YOUR FIREBASE CONFIG — EXACTLY AS PROVIDED
+    const firebaseConfig = {
+      apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
+      authDomain: "betx-5852a.firebaseapp.com",
+      projectId: "betx-5852a",
+      storageBucket: "betx-5852a.firebasestorage.app",
+      messagingSenderId: "1034960375081",
+      appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
+      measurementId: "G-X8SD5DC9RY"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Create stars background
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 150; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.width = `${Math.random() * 2 + 1}px`;
+      star.style.height = star.style.width;
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      starsContainer.appendChild(star);
+    }
+
+    // Toggle between Login and Register forms
+    function toggleForm() {
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const formTitle = document.querySelector('.header h1');
+      const switchBtn = document.querySelector('.switch-form');
+
+      if (loginForm.style.display === 'none') {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        formTitle.textContent = 'Login';
+        switchBtn.classList.remove('active');
+      } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        formTitle.textContent = 'Register';
+        switchBtn.classList.add('active');
+      }
+    }
+
+    // Handle Login
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('Please enter both email and password.');
+        return;
+      }
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Load user profile from Firestore
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (!doc.exists) {
+          throw new Error('User profile not found. Please contact support.');
+        }
+
+        const userData = doc.data();
+
+        // Store in localStorage for session
+        localStorage.setItem('user', JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          balance: userData.balance || 0
+        }));
+
+        // Redirect to dashboard
+        window.location.href = 'index.html';
+      } catch (error) {
+        let msg = 'Login failed: ';
+        if (error.code === 'auth/user-not-found') msg += 'No account found.';
+        else if (error.code === 'auth/wrong-password') msg += 'Wrong password.';
+        else if (error.code === 'auth/invalid-email') msg += 'Invalid email.';
+        else msg += error.message;
+        alert(msg);
+      }
+    }
+
+    // Handle Registration
+    async function register() {
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+
+      if (!email || !password) {
+        alert('Please enter both email and password.');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        return;
+      }
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Create user profile in Firestore
+        await db.collection('users').doc(user.uid).set({
+          email: user.email,
+          balance: 0,
+          deposits: [],
+          withdrawals: [],
+          createdAt: Date.now()
+        });
+
+        alert('🎉 Account created! You can now log in.');
+        toggleForm(); // Switch back to login form
+      } catch (error) {
+        let msg = 'Registration failed: ';
+        if (error.code === 'auth/email-already-in-use') msg += 'This email is already registered.';
+        else if (error.code === 'auth/invalid-email') msg += 'Invalid email format.';
+        else msg += error.message;
+        alert(msg);
+      }
+    }
+
+    // Auto-login check on page load
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // If already logged in, redirect to dashboard
+        window.location.href = 'index.html';
+      }
+    });
+
+    // Prevent form submission from refreshing page
+    document.getElementById('login-form').addEventListener('submit', (e) => e.preventDefault());
+    document.getElementById('register-form').addEventListener('submit', (e) => e.preventDefault());
+  </script>
+</body>
+</html>
