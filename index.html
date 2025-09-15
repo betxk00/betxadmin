@@ -1,599 +1,557 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Betz Casino</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background: linear-gradient(135deg, #0a192f, #172a45);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #e6f1ff;
-      overflow: hidden;
-      position: relative;
-      padding: 0;
-    }
-
-    /* Decorative elements for casino vibe */
-    .stars {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .star {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 3s infinite ease-in-out;
-    }
-
-    @keyframes twinkle {
-      0%, 100% { opacity: 0.2; }
-      50% { opacity: 1; }
-    }
-
-    .container {
-      width: 92%;
-      max-width: 420px;
-      background: rgba(15, 25, 47, 0.85);
-      backdrop-filter: blur(12px);
-      border-radius: 28px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
-                  0 0 40px rgba(0, 187, 255, 0.15);
-      overflow: hidden;
-      position: relative;
-      border: 1px solid rgba(0, 187, 255, 0.1);
-      animation: fadeIn 0.8s ease-out;
-    }
-
-    .header {
-      text-align: center;
-      padding: 35px 25px 20px;
-      position: relative;
-    }
-
-    .header h1 {
-      font-size: 2.8rem;
-      margin-bottom: 8px;
-      background: linear-gradient(to right, #00bfff, #0077cc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0, 187, 255, 0.3);
-      font-weight: 800;
-      letter-spacing: -0.8px;
-      position: relative;
-    }
-
-    .header h1::after {
-      content: '🎰';
-      position: absolute;
-      right: -30px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2.2rem;
-      animation: spin 4s infinite linear;
-    }
-
-    @keyframes spin {
-      0% { transform: translateY(-50%) rotate(0deg); }
-      100% { transform: translateY(-50%) rotate(360deg); }
-    }
-
-    .header p {
-      font-size: 0.95rem;
-      color: #a0c8ff;
-      margin-top: -5px;
-      opacity: 0.9;
-    }
-
-    .form-container {
-      padding: 0 30px 35px;
-      position: relative;
-    }
-
-    .input-group {
-      margin-bottom: 22px;
-      position: relative;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: #cbd5e1;
-      font-weight: 500;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 16px 18px;
-      border: none;
-      background: #0f172a;
-      border-radius: 12px;
-      color: white;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      outline: none;
-      border: 1px solid #1e293b;
-      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    .input-group input:focus {
-      box-shadow: 0 0 0 3px rgba(0, 187, 255, 0.25), 
-                  0 2px 10px rgba(0, 187, 255, 0.15);
-      transform: translateY(-2px);
-      border-color: #00bfff;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #00bfff, #0077cc);
-      color: black;
-      border: none;
-      border-radius: 12px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-bottom: 18px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 6px 15px rgba(0, 187, 255, 0.3);
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: 0.5s;
-    }
-
-    .btn:hover::before {
-      left: 100%;
-    }
-
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(0, 187, 255, 0.4);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .toggle-btn {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 0.9rem;
-      color: #94a3b8;
-    }
-
-    .toggle-btn a {
-      color: #00bfff;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s;
-    }
-
-    .toggle-btn a:hover {
-      color: #ffffff;
-      text-decoration: underline;
-    }
-
-    .social-login {
-      margin-top: 25px;
-      text-align: center;
-      font-size: 0.85rem;
-      color: #64748b;
-    }
-
-    .social-login span {
-      margin: 0 8px;
-    }
-
-    .social-login button {
-      width: 48px;
-      height: 48px;
-      border: none;
-      background: #0f172a;
-      border-radius: 50%;
-      margin: 0 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      color: #94a3b8;
-      font-size: 1.1rem;
-      border: 1px solid #1e293b;
-    }
-
-    .social-login button:hover {
-      background: #00bfff;
-      color: black;
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(0, 187, 255, 0.4);
-    }
-
-    .left-panel {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(135deg, #00bfff, #0077cc);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      padding: 30px;
-      z-index: 1;
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow: hidden;
-    }
-
-    .left-panel::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: pulse 4s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.3); opacity: 0.2; }
-      100% { transform: scale(1); opacity: 0.6; }
-    }
-
-    .title {
-      font-size: 2.8rem;
-      margin-bottom: 12px;
-      font-weight: 800;
-      text-shadow: 0 0 20px rgba(0, 187, 255, 0.5);
-      letter-spacing: -1px;
-      position: relative;
-    }
-
-    .title::after {
-      content: '🎰';
-      position: absolute;
-      right: -35px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2.4rem;
-      animation: spin 4s infinite linear;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      opacity: 0.9;
-      text-align: center;
-      line-height: 1.5;
-      max-width: 220px;
-      position: relative;
-    }
-
-    .switch-form {
-      position: absolute;
-      top: 25px;
-      right: 25px;
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      background: #00bfff;
-      border-radius: 50%;
-      z-index: 3;
-      transition: all 0.4s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 187, 255, 0.3);
-    }
-
-    .switch-form::before {
-      content: '';
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: white;
-      border-radius: 50%;
-      transition: all 0.4s ease;
-      transform-origin: center;
-    }
-
-    .switch-form.active {
-      background: #0f172a;
-      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.5);
-    }
-
-    .switch-form.active::before {
-      transform: rotate(180deg) scale(0.8);
-      background: #00bfff;
-    }
-
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideInLeft {
-      from { transform: translateX(-100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes slideInRight {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    .animate-left {
-      animation: slideInLeft 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    .animate-right {
-      animation: slideInRight 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    /* Responsive */
-    @media (max-width: 420px) {
-      .title { font-size: 2.4rem; }
-      .header h1 { font-size: 2.3rem; }
-      .container { width: 95%; }
-    }
-
-    /* Hide scrollbars */
-    ::-webkit-scrollbar {
-      display: none;
-    }
-    body {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower Blast - Kashim</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #87CEEB;
+            font-family: 'Arial', sans-serif;
+            cursor: pointer;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #bigFlower {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .petal {
+            position: absolute;
+            background-color: #FF69B4;
+            border-radius: 50% 50% 50% 0;
+            transform-origin: bottom center;
+        }
+        
+        .center {
+            position: absolute;
+            background-color: #FFD700;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .stem {
+            position: absolute;
+            background-color: #228B22;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: top center;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        #nameDisplay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw;
+            font-weight: bold;
+            color: #8A2BE2; /* Purple color for Kashim */
+            text-shadow: 
+                0 0 10px #FFFFFF,
+                0 0 20px #FFFFFF,
+                0 0 30px #9370DB,
+                0 0 40px #9370DB;
+            opacity: 0;
+            z-index: 100;
+            text-align: center;
+            font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif;
+            letter-spacing: 5px;
+            transition: all 2s ease;
+        }
+        
+        .click-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FF69B4, #9370DB);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .celebration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 200;
+        }
+    </style>
 </head>
 <body>
-  <!-- Decorative stars -->
-  <div class="stars" id="stars"></div>
-
-  <div class="container">
-    <!-- Left Panel: Welcome Screen -->
-    <div class="left-panel animate-left">
-      <div class="title">Betz Casino</div>
-      <div class="subtitle">Where Luck Meets Luxury — Play Now, Win Big!</div>
-      <div class="switch-form" onclick="toggleForm()"></div>
-    </div>
-
-    <!-- Right Panel: Form -->
-    <div class="right-panel animate-right">
-      <div class="form-container">
-        <div class="header">
-          <h1>Login</h1>
-          <p>Enter your credentials to access your account</p>
+    <div id="container">
+        <div id="bigFlower"></div>
+        <div id="nameDisplay">KASHIM</div>
+        <div class="click-counter">Clicks: 0/50</div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
         </div>
-
-        <!-- Login Form -->
-        <form id="login-form">
-          <div class="input-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" />
-          </div>
-          <div class="input-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" />
-          </div>
-          <button type="submit" class="btn" onclick="login()">Login</button>
-          <div class="toggle-btn">
-            Don’t have an account? <a href="#" onclick="toggleForm()">Register</a>
-          </div>
-          <div class="social-login">
-            Or login with:
-            <span>
-              <button type="button"><i>g</i></button>
-              <button type="button"><i>f</i></button>
-              <button type="button"><i>i</i></button>
-            </span>
-          </div>
-        </form>
-
-        <!-- Register Form -->
-        <form id="register-form" style="display: none;">
-          <div class="input-group">
-            <label for="reg-email">Email Address</label>
-            <input type="email" id="reg-email" placeholder="you@example.com" required autocomplete="email" />
-          </div>
-          <div class="input-group">
-            <label for="reg-password">Create Password</label>
-            <input type="password" id="reg-password" placeholder="••••••••" required autocomplete="new-password" />
-          </div>
-          <button type="submit" class="btn" onclick="register()">Register</button>
-          <div class="toggle-btn">
-            Already have an account? <a href="#" onclick="toggleForm()">Login</a>
-          </div>
-          <div class="social-login">
-            Or register with:
-            <span>
-              <button type="button"><i>g</i></button>
-              <button type="button"><i>f</i></button>
-              <button type="button"><i>i</i></button>
-            </span>
-          </div>
-        </form>
-      </div>
     </div>
-  </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-
-  <script>
-    // 🔐 YOUR FIREBASE CONFIG — EXACTLY AS PROVIDED
-    const firebaseConfig = {
-      apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
-      authDomain: "betx-5852a.firebaseapp.com",
-      projectId: "betx-5852a",
-      storageBucket: "betx-5852a.firebasestorage.app",
-      messagingSenderId: "1034960375081",
-      appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
-      measurementId: "G-X8SD5DC9RY"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Create stars background
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 150; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
-      star.style.width = `${Math.random() * 2 + 1}px`;
-      star.style.height = star.style.width;
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.animationDelay = `${Math.random() * 5}s`;
-      starsContainer.appendChild(star);
-    }
-
-    // Toggle between Login and Register forms
-    function toggleForm() {
-      const loginForm = document.getElementById('login-form');
-      const registerForm = document.getElementById('register-form');
-      const formTitle = document.querySelector('.header h1');
-      const switchBtn = document.querySelector('.switch-form');
-
-      if (loginForm.style.display === 'none') {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        formTitle.textContent = 'Login';
-        switchBtn.classList.remove('active');
-      } else {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        formTitle.textContent = 'Register';
-        switchBtn.classList.add('active');
-      }
-    }
-
-    // Handle Login
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      if (!email || !password) {
-        alert('Please enter both email and password.');
-        return;
-      }
-
-      try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        // Load user profile from Firestore
-        const doc = await db.collection('users').doc(user.uid).get();
-        if (!doc.exists) {
-          throw new Error('User profile not found. Please contact support.');
-        }
-
-        const userData = doc.data();
-
-        // Store in localStorage for session
-        localStorage.setItem('user', JSON.stringify({
-          uid: user.uid,
-          email: user.email,
-          balance: userData.balance || 0
-        }));
-
-        // Redirect to dashboard
-        window.location.href = 'index.html';
-      } catch (error) {
-        let msg = 'Login failed: ';
-        if (error.code === 'auth/user-not-found') msg += 'No account found.';
-        else if (error.code === 'auth/wrong-password') msg += 'Wrong password.';
-        else if (error.code === 'auth/invalid-email') msg += 'Invalid email.';
-        else msg += error.message;
-        alert(msg);
-      }
-    }
-
-    // Handle Registration
-    async function register() {
-      const email = document.getElementById('reg-email').value;
-      const password = document.getElementById('reg-password').value;
-
-      if (!email || !password) {
-        alert('Please enter both email and password.');
-        return;
-      }
-
-      if (password.length < 6) {
-        alert('Password must be at least 6 characters long.');
-        return;
-      }
-
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-
-        // Create user profile in Firestore
-        await db.collection('users').doc(user.uid).set({
-          email: user.email,
-          balance: 0,
-          deposits: [],
-          withdrawals: [],
-          createdAt: Date.now()
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('container');
+            const bigFlower = document.getElementById('bigFlower');
+            const nameDisplay = document.getElementById('nameDisplay');
+            const clickCounter = document.querySelector('.click-counter');
+            const progressFill = document.querySelector('.progress-fill');
+            
+            let clicks = 0;
+            const requiredClicks = 50;
+            
+            // Create the big flower
+            function createBigFlower() {
+                // Create stem
+                const stem = document.createElement('div');
+                stem.className = 'stem';
+                stem.style.width = '10px';
+                stem.style.height = '150px';
+                bigFlower.appendChild(stem);
+                
+                // Create flower center
+                const center = document.createElement('div');
+                center.className = 'center';
+                center.style.width = '40px';
+                center.style.height = '40px';
+                bigFlower.appendChild(center);
+                
+                // Create petals
+                const petalCount = 8;
+                for (let i = 0; i < petalCount; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    petal.style.width = '30px';
+                    petal.style.height = '60px';
+                    petal.style.left = '50%';
+                    petal.style.top = '50%';
+                    petal.style.transform = `translate(-50%, -100%) rotate(${i * 45}deg)`;
+                    bigFlower.appendChild(petal);
+                }
+            }
+            
+            // Handle flower click
+            bigFlower.addEventListener('click', function() {
+                clicks++;
+                clickCounter.textContent = `Clicks: ${clicks}/${requiredClicks}`;
+                
+                // Update progress bar
+                progressFill.style.width = `${(clicks / requiredClicks) * 100}%`;
+                
+                // Visual feedback
+                bigFlower.style.transform = 'translate(-50%, -50%) scale(1.1)';
+                setTimeout(() => {
+                    bigFlower.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 200);
+                
+                // Show progress messages at certain milestones
+                if (clicks === 10) {
+                    showProgressMessage("10 clicks down! Keep going!");
+                } else if (clicks === 25) {
+                    showProgressMessage("Halfway there! 25 clicks!");
+                } else if (clicks === 40) {
+                    showProgressMessage("Almost there! Just 10 more clicks!");
+                } else if (clicks === 45) {
+                    showProgressMessage("5 more to go! Get ready!");
+                }
+                
+                if (clicks >= requiredClicks) {
+                    // Trigger flower blast
+                    blastFlower();
+                }
+            });
+            
+            // Show progress message
+            function showProgressMessage(message) {
+                const msg = document.createElement('div');
+                msg.textContent = message;
+                msg.style.position = 'absolute';
+                msg.style.top = '100px';
+                msg.style.left = '50%';
+                msg.style.transform = 'translateX(-50%)';
+                msg.style.fontSize = '24px';
+                msg.style.color = '#333';
+                msg.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                msg.style.padding = '15px 25px';
+                msg.style.borderRadius = '25px';
+                msg.style.zIndex = '1000';
+                msg.style.opacity = '0';
+                msg.style.transition = 'all 1s ease';
+                container.appendChild(msg);
+                
+                // Animate in
+                setTimeout(() => {
+                    msg.style.opacity = '1';
+                    msg.style.transform = 'translateX(-50%) translateY(-10px)';
+                }, 100);
+                
+                // Animate out and remove
+                setTimeout(() => {
+                    msg.style.opacity = '0';
+                    msg.style.transform = 'translateX(-50%) translateY(-30px)';
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 1000);
+                }, 3000);
+            }
+            
+            // Flower blast animation
+            function blastFlower() {
+                // Hide the big flower
+                bigFlower.style.opacity = '0';
+                bigFlower.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                
+                // Create explosion particles
+                for (let i = 0; i < 300; i++) {
+                    createParticle();
+                }
+                
+                // Show the name with animation
+                setTimeout(() => {
+                    nameDisplay.style.opacity = '1';
+                    nameDisplay.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                    setTimeout(() => {
+                        nameDisplay.style.transform = 'translate(-50%, -50%) scale(1)';
+                    }, 500);
+                }, 1000);
+                
+                // Create celebration elements
+                setTimeout(() => {
+                    createCelebration();
+                }, 1500);
+            }
+            
+            // Create a particle for the explosion
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random properties
+                const size = Math.random() * 20 + 10;
+                const color = getRandomColor();
+                const x = window.innerWidth / 2;
+                const y = window.innerHeight / 2;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 15 + 5;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                // Apply styles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+                
+                container.appendChild(particle);
+                
+                // Animate the particle
+                let posX = x;
+                let posY = y;
+                let opacity = 1;
+                let scale = 1;
+                
+                const animate = () => {
+                    posX += vx;
+                    posY += vy + 0.2; // Add gravity
+                    opacity -= 0.01;
+                    scale -= 0.005;
+                    
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    particle.style.opacity = opacity;
+                    particle.style.transform = `scale(${Math.max(scale, 0)})`;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        particle.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Generate random color for particles
+            function getRandomColor() {
+                const colors = [
+                    '#FF69B4', '#FF1493', '#FFB6C1', '#FFC0CB', 
+                    '#FF6347', '#FF4500', '#FF8C00', '#FFD700',
+                    '#9370DB', '#BA55D3', '#8A2BE2', '#9932CC',
+                    '#4169E1', '#00BFFF', '#20B2AA', '#32CD32'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            // Create celebration elements (confetti, additional flowers, etc.)
+            function createCelebration() {
+                // Create confetti
+                for (let i = 0; i < 100; i++) {
+                    createConfetti();
+                }
+                
+                // Create many flowers
+                createManyFlowers();
+                
+                // Add some special effects
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        createSpecialFlower();
+                    }, i * 500);
+                }
+            }
+            
+            // Create confetti for celebration
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.className = 'celebration';
+                
+                const shapes = ['circle', 'square', 'triangle'];
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                const color = getRandomColor();
+                const size = Math.random() * 10 + 5;
+                const x = Math.random() * window.innerWidth;
+                const y = -20;
+                
+                confetti.style.left = `${x}px`;
+                confetti.style.top = `${y}px`;
+                
+                if (shape === 'circle') {
+                    confetti.style.borderRadius = '50%';
+                } else if (shape === 'triangle') {
+                    confetti.style.width = '0';
+                    confetti.style.height = '0';
+                    confetti.style.backgroundColor = 'transparent';
+                    confetti.style.borderLeft = `${size/2}px solid transparent`;
+                    confetti.style.borderRight = `${size/2}px solid transparent`;
+                    confetti.style.borderBottom = `${size}px solid ${color}`;
+                    confetti.style.borderRadius = '0';
+                } else {
+                    confetti.style.borderRadius = '0';
+                }
+                
+                if (shape !== 'triangle') {
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.backgroundColor = color;
+                }
+                
+                container.appendChild(confetti);
+                
+                // Animate falling
+                let posY = y;
+                const speed = Math.random() * 5 + 2;
+                const rotation = Math.random() * 360;
+                let rotationAngle = 0;
+                
+                const animate = () => {
+                    posY += speed;
+                    rotationAngle += 5;
+                    
+                    confetti.style.top = `${posY}px`;
+                    confetti.style.transform = `rotate(${rotationAngle}deg)`;
+                    
+                    if (posY < window.innerHeight + 50) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Create many flowers after blast
+            function createManyFlowers() {
+                for (let i = 0; i < 80; i++) {
+                    setTimeout(() => {
+                        const flower = document.createElement('div');
+                        flower.style.position = 'absolute';
+                        flower.style.width = '40px';
+                        flower.style.height = '40px';
+                        flower.style.left = `${Math.random() * 100}%`;
+                        flower.style.top = `${Math.random() * 100}%`;
+                        flower.style.opacity = '0';
+                        flower.style.transform = 'scale(0)';
+                        
+                        // Create flower center
+                        const center = document.createElement('div');
+                        center.style.width = '10px';
+                        center.style.height = '10px';
+                        center.style.backgroundColor = '#FFD700';
+                        center.style.borderRadius = '50%';
+                        center.style.position = 'absolute';
+                        center.style.top = '50%';
+                        center.style.left = '50%';
+                        center.style.transform = 'translate(-50%, -50%)';
+                        flower.appendChild(center);
+                        
+                        // Create petals
+                        const petalCount = 6;
+                        for (let j = 0; j < petalCount; j++) {
+                            const petal = document.createElement('div');
+                            petal.style.position = 'absolute';
+                            petal.style.width = '8px';
+                            petal.style.height = '15px';
+                            petal.style.backgroundColor = getRandomColor();
+                            petal.style.borderRadius = '50% 50% 50% 0';
+                            petal.style.transform = `translate(-50%, -100%) rotate(${j * 60}deg)`;
+                            petal.style.left = '50%';
+                            petal.style.top = '50%';
+                            flower.appendChild(petal);
+                        }
+                        
+                        container.appendChild(flower);
+                        
+                        // Animate flower appearance
+                        setTimeout(() => {
+                            flower.style.transition = 'all 1s ease';
+                            flower.style.opacity = '0.7';
+                            flower.style.transform = 'scale(1)';
+                        }, 100);
+                    }, i * 50);
+                }
+            }
+            
+            // Create special animated flowers
+            function createSpecialFlower() {
+                const flower = document.createElement('div');
+                flower.style.position = 'absolute';
+                flower.style.width = '60px';
+                flower.style.height = '60px';
+                flower.style.left = `${Math.random() * 100}%`;
+                flower.style.top = `${Math.random() * 100}%`;
+                flower.style.opacity = '0';
+                flower.style.transform = 'scale(0)';
+                flower.style.zIndex = '50';
+                
+                // Create flower center
+                const center = document.createElement('div');
+                center.style.width = '15px';
+                center.style.height = '15px';
+                center.style.backgroundColor = '#FFFF00';
+                center.style.borderRadius = '50%';
+                center.style.position = 'absolute';
+                center.style.top = '50%';
+                center.style.left = '50%';
+                center.style.transform = 'translate(-50%, -50%)';
+                center.style.boxShadow = '0 0 10px #FFFF00';
+                flower.appendChild(center);
+                
+                // Create larger petals
+                const petalCount = 8;
+                for (let j = 0; j < petalCount; j++) {
+                    const petal = document.createElement('div');
+                    petal.style.position = 'absolute';
+                    petal.style.width = '15px';
+                    petal.style.height = '25px';
+                    petal.style.backgroundColor = getRandomSpecialColor();
+                    petal.style.borderRadius = '50% 50% 50% 0';
+                    petal.style.transform = `translate(-50%, -100%) rotate(${j * 45}deg)`;
+                    petal.style.left = '50%';
+                    petal.style.top = '50%';
+                    petal.style.boxShadow = `0 0 8px ${getRandomSpecialColor()}`;
+                    flower.appendChild(petal);
+                }
+                
+                container.appendChild(flower);
+                
+                // Animate flower appearance with bounce
+                setTimeout(() => {
+                    flower.style.transition = 'all 1s ease';
+                    flower.style.opacity = '1';
+                    flower.style.transform = 'scale(1.2)';
+                    
+                    setTimeout(() => {
+                        flower.style.transform = 'scale(1)';
+                    }, 300);
+                    
+                    // Add continuous gentle rotation
+                    let angle = 0;
+                    setInterval(() => {
+                        angle += 0.5;
+                        flower.style.transform = `scale(1) rotate(${angle}deg)`;
+                    }, 50);
+                }, 100);
+            }
+            
+            // Get special colors for celebration flowers
+            function getRandomSpecialColor() {
+                const colors = [
+                    '#FF1493', '#FF00FF', '#DA70D6', '#9932CC', '#8A2BE2'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            // Initialize the big flower
+            createBigFlower();
+            
+            // Add a message to guide the user
+            const instruction = document.createElement('div');
+            instruction.textContent = 'Click the flower 50 times to reveal something special!';
+            instruction.style.position = 'absolute';
+            instruction.style.top = '20px';
+            instruction.style.left = '50%';
+            instruction.style.transform = 'translateX(-50%)';
+            instruction.style.fontSize = '24px';
+            instruction.style.color = '#333';
+            instruction.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            instruction.style.padding = '10px 20px';
+            instruction.style.borderRadius = '20px';
+            instruction.style.zIndex = '1000';
+            container.appendChild(instruction);
+            
+            // Remove instruction after 8 seconds
+            setTimeout(() => {
+                instruction.style.opacity = '0';
+                instruction.style.transition = 'opacity 2s ease';
+                setTimeout(() => {
+                    instruction.remove();
+                }, 2000);
+            }, 8000);
         });
-
-        alert('🎉 Account created! You can now log in.');
-        toggleForm(); // Switch back to login form
-      } catch (error) {
-        let msg = 'Registration failed: ';
-        if (error.code === 'auth/email-already-in-use') msg += 'This email is already registered.';
-        else if (error.code === 'auth/invalid-email') msg += 'Invalid email format.';
-        else msg += error.message;
-        alert(msg);
-      }
-    }
-
-    // Auto-login check on page load
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // If already logged in, redirect to dashboard
-        window.location.href = 'index.html';
-      }
-    });
-
-    // Prevent form submission from refreshing page
-    document.getElementById('login-form').addEventListener('submit', (e) => e.preventDefault());
-    document.getElementById('register-form').addEventListener('submit', (e) => e.preventDefault());
-  </script>
+    </script>
 </body>
 </html>
