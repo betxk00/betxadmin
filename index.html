@@ -917,7 +917,8 @@
                 name: email.split('@')[0],
                 email: email,
                 uid: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase()
+                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                balance: 10000 // Starting balance ₹10,000 for all users
             };
             localStorage.setItem('betxUser', JSON.stringify(userData));
             // Redirect to homepage
@@ -935,12 +936,13 @@
                 document.getElementById('register-error').classList.add('show');
                 return;
             }
-            // Generate fake user data with unique Account ID
+            // Generate fake user data with unique Account ID and starting balance
             const userData = {
                 name: name,
                 email: email,
                 uid: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase()
+                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                balance: 10000 // Starting balance ₹10,000 for all users
             };
             localStorage.setItem('betxUser', JSON.stringify(userData));
             // Redirect to homepage
