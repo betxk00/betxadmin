@@ -422,122 +422,148 @@ let bet = 0;
 let winnings = 0;
 let multiplier = 1;
 let multiplierStep = 1.25;
-let balance = 1000; // demo balance
+let balance = 10000; // Will be overwritten by localStorage
 let safeClicks = 0;
-function updateBalance(){
-  document.getElementById("balance").textContent = "₨" + balance.toFixed(2);
-}
-function setupGrid(){
-  grid.innerHTML = "";
-  cells=[];
-  for(let i=0;i<16;i++){ // 4x4 grid
-    const c=document.createElement("div");
-    c.className="cell";
-    c.onclick=()=>reveal(i);
-    // Add iOS-style ripple effect
-    c.addEventListener('touchstart', createRipple);
-    c.addEventListener('mousedown', createRipple);
-    grid.appendChild(c);
-    cells.push(c);
-  }
-}
-// Create iOS-style ripple effect
-function createRipple(e) {
-  if (!playing) return;
-  const button = e.currentTarget;
-  const existingRipple = button.querySelector('.ripple');
-  if (existingRipple) existingRipple.remove();
-  const ripple = document.createElement('span');
-  ripple.classList.add('ripple');
-  button.appendChild(ripple);
-  const rect = button.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height);
-  const x = e.clientX - rect.left - size / 2;
-  const y = e.clientY - rect.top - size / 2;
-  ripple.style.width = ripple.style.height = `${size}px`;
-  ripple.style.left = `${x}px`;
-  ripple.style.top = `${y}px`;
-  setTimeout(() => ripple.remove(), 600);
-}
-setupGrid();
-document.getElementById("betBtn").onclick=function(){
-  if(!playing){
-    bet=parseInt(document.getElementById("betAmount").value)||0;
-    if(bet<30){ showPopup("Min bet is 30", false); return; }
-    if(bet>balance){ showPopup("Not enough balance!", false); return; }
-    balance -= bet;
-    updateBalance();
-    winnings=bet;
-    multiplier=1;
-    safeClicks=0;
-    playing=true;
-    this.textContent="Cashout";
-    let mines = parseInt(document.getElementById("minesCount").value);
-    multiplierStep = 1.2 + mines*0.05;
-    mineIndexes=[];
-    while(mineIndexes.length<mines){
-      let r=Math.floor(Math.random()*16);
-      if(!mineIndexes.includes(r)) mineIndexes.push(r);
+
+// Load balance from localStorage
+function loadBalance() {
+    const userData = JSON.parse(localStorage.getItem('betxUser'));
+    if (userData && userData.balance !== undefined) {
+        balance = userData.balance;
     }
-    document.getElementById("cashoutInfo").textContent="Multiplier: x1.00 | Win: ₨"+winnings;
-  } else {
-    balance += winnings;
     updateBalance();
-    showPopup("You cashed out ₨"+winnings, true);
-    resetGame();
-  }
+}
+
+// Save balance to localStorage
+function saveBalance() {
+    const userData = JSON.parse(localStorage.getItem('betxUser'));
+    if (userData) {
+        userData.balance = balance;
+        localStorage.setItem('betxUser', JSON.stringify(userData));
+    }
+    updateBalance();
+}
+
+function updateBalance(){
+    document.getElementById("balance").textContent = "₨" + balance.toFixed(2);
+}
+
+function setupGrid(){
+    grid.innerHTML = "";
+    cells=[];
+    for(let i=0;i<16;i++){
+        const c=document.createElement("div");
+        c.className="cell";
+        c.onclick=()=>reveal(i);
+        c.addEventListener('touchstart', createRipple);
+        c.addEventListener('mousedown', createRipple);
+        grid.appendChild(c);
+        cells.push(c);
+    }
+}
+
+function createRipple(e) {
+    if (!playing) return;
+    const button = e.currentTarget;
+    const existingRipple = button.querySelector('.ripple');
+    if (existingRipple) existingRipple.remove();
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    button.appendChild(ripple);
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    setTimeout(() => ripple.remove(), 600);
+}
+
+setupGrid();
+loadBalance(); // Load balance on page load
+
+document.getElementById("betBtn").onclick=function(){
+    if(!playing){
+        bet=parseInt(document.getElementById("betAmount").value)||0;
+        if(bet<30){ showPopup("Min bet is 30", false); return; }
+        if(bet>balance){ showPopup("Not enough balance!", false); return; }
+        balance -= bet;
+        saveBalance(); // Save balance after betting
+        winnings=bet;
+        multiplier=1;
+        safeClicks=0;
+        playing=true;
+        this.textContent="Cashout";
+        let mines = parseInt(document.getElementById("minesCount").value);
+        multiplierStep = 1.2 + mines*0.05;
+        mineIndexes=[];
+        while(mineIndexes.length<mines){
+            let r=Math.floor(Math.random()*16);
+            if(!mineIndexes.includes(r)) mineIndexes.push(r);
+        }
+        document.getElementById("cashoutInfo").textContent="Multiplier: x1.00 | Win: ₨"+winnings;
+    } else {
+        balance += winnings;
+        saveBalance(); // Save balance after cashing out
+        showPopup("You cashed out ₨"+winnings, true);
+        resetGame();
+    }
 };
+
 function reveal(i){
-  if(!playing) return;
-  const c=cells[i];
-  if(c.classList.contains("revealed")) return;
-  c.classList.add("revealed");
-  // Rigging logic for demo
-  if(balance >= 2500 || safeClicks >= 5){
-    lose(c);
-    return;
-  }
-  if(mineIndexes.includes(i)){
-    lose(c);
-  } else {
-    safeClicks++;
-    multiplier *= multiplierStep;
-    winnings = Math.floor(bet * multiplier);
-    // Add breaking animation before showing diamond
-    c.classList.add("breaking");
-    setTimeout(() => {
-      c.classList.add("diamond");
-      document.getElementById("cashoutInfo").textContent="Multiplier: x"+multiplier.toFixed(2)+" | Win: ₨"+winnings;
-      showPopup("✨ You found a Diamond! ₨"+winnings, true);
-    }, 600);
-  }
+    if(!playing) return;
+    const c=cells[i];
+    if(c.classList.contains("revealed")) return;
+    c.classList.add("revealed");
+    if(balance >= 25000 || safeClicks >= 5){
+        lose(c);
+        return;
+    }
+    if(mineIndexes.includes(i)){
+        lose(c);
+    } else {
+        safeClicks++;
+        multiplier *= multiplierStep;
+        winnings = Math.floor(bet * multiplier);
+        c.classList.add("breaking");
+        setTimeout(() => {
+            c.classList.add("diamond");
+            document.getElementById("cashoutInfo").textContent="Multiplier: x"+multiplier.toFixed(2)+" | Win: ₨"+winnings;
+            showPopup("✨ You found a Diamond! ₨"+winnings, true);
+        }, 600);
+    }
 }
+
 function lose(cell){
-  cell.classList.add("bomb");
-  showPopup("💥 You Lost! Try Again", false);
-  resetGame();
+    cell.classList.add("bomb");
+    showPopup("💥 You Lost! Try Again", false);
+    resetGame();
 }
+
 function resetGame(){
-  playing=false;
-  document.getElementById("betBtn").textContent="Bet";
-  document.getElementById("cashoutInfo").textContent="";
-  setupGrid();
+    playing=false;
+    document.getElementById("betBtn").textContent="Bet";
+    document.getElementById("cashoutInfo").textContent="";
+    setupGrid();
 }
+
 function halfBet(){
-  let amt=parseInt(document.getElementById("betAmount").value)||0;
-  document.getElementById("betAmount").value=Math.floor(amt/2) || 30;
+    let amt=parseInt(document.getElementById("betAmount").value)||0;
+    document.getElementById("betAmount").value=Math.floor(amt/2) || 30;
 }
+
 function doubleBet(){
-  let amt=parseInt(document.getElementById("betAmount").value)||0;
-  document.getElementById("betAmount").value=amt*2 || 60;
+    let amt=parseInt(document.getElementById("betAmount").value)||0;
+    document.getElementById("betAmount").value=amt*2 || 60;
 }
+
 function showPopup(msg, win){
-  const popup=document.getElementById("popup");
-  popup.textContent=msg;
-  popup.className="popup show " + (win?"win":"lose");
-  setTimeout(()=>popup.classList.remove("show"),2200);
+    const popup=document.getElementById("popup");
+    popup.textContent=msg;
+    popup.className="popup show " + (win?"win":"lose");
+    setTimeout(()=>popup.classList.remove("show"),2200);
 }
-updateBalance();
 </script>
 </body>
 </html>
