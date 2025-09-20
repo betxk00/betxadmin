@@ -1,1 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetX Casino - Aviator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0f0f1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .header {
+            background: #1a1a2e;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            background: linear-gradient(to right, #00f0ff, #ff2a6d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .user-info {
+            text-align: right;
+        }
+        .balance {
+            font-weight: bold;
+            color: #00f0ff;
+            font-size: 18px;
+        }
+        .account-id {
+            font-size: 12px;
+            color: #b0b0c0;
+            margin-top: 2px;
+        }
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #1a1a2e, #0f0f1a);
+            z-index: 1;
+        }
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20%;
+            background: #16213e;
+            z-index: 2;
+            border-top: 2px solid #00f0ff;
+        }
+        .plane {
+            position: absolute;
+            font-size: 40px;
+            transition: all 0.1s linear;
+            z-index: 3;
+            transform: rotate(-15deg);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+        }
+        .multiplier {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00f0ff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            z-index: 4;
+            position: relative;
+        }
+        .bet-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            z-index: 4;
+            position: relative;
+        }
+        .bet-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #00f0ff, #00c3ff);
+            color: #0f0f1a;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+        }
+        .bet-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+        }
+        .cashout-btn {
+            background: linear-gradient(45deg, #ff2a6d, #ff5e62);
+        }
+        .stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 4;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #1a1a2e;
+            border-top: 5px solid #00f0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            font-size: 18px;
+            color: #00f0ff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">BetX Casino</div>
+        <div class="user-info">
+            <div class="balance" id="user-balance">₹0.00</div>
+            <div class="account-id" id="account-id">ID: ---</div>
+        </div>
+    </div>
 
+    <div class="game-container">
+        <div class="sky"></div>
+        <div class="plane" id="plane">✈️</div>
+        <div class="multiplier" id="multiplier">x1.00</div>
+        <div class="bet-controls">
+            <button class="bet-btn" id="bet-btn">Place Bet</button>
+            <button class="bet-btn cashout-btn" id="cashout-btn" disabled>Cash Out</button>
+        </div>
+        <div class="ground"></div>
+        <div class="stats">
+            <div>Last Crash: <span id="last-crash">x2.45</span></div>
+            <div>Next Game: <span id="next-game">3s</span></div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loader"></div>
+        <div class="message">Loading Aviator Game...</div>
+        <div class="message">Please wait while we prepare your flight ✈️</div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const userData = JSON.parse(localStorage.getItem('betxUser'));
+        if (!userData) {
+            alert("Please login first!");
+            window.location.href = '../index.html';
+        }
+
+        // Initialize game
+        let currentBalance = 50000;
+        let currentBet = 0;
+        let isPlaying = false;
+        let planePosition = 0;
+        let multiplier = 1.00;
+        let gameInterval;
+
+        // DOM Elements
+        const userBalanceEl = document.getElementById('user-balance');
+        const accountIdEl = document.getElementById('account-id');
+        const planeEl = document.getElementById('plane');
+        const multiplierEl = document.getElementById('multiplier');
+        const betBtn = document.getElementById('bet-btn');
+        const cashoutBtn = document.getElementById('cashout-btn');
+        const lastCrashEl = document.getElementById('last-crash');
+        const nextGameEl = document.getElementById('next-game');
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Display user info
+        userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+        accountIdEl.textContent = `ID: ${userData.accountNumber || userData.uid.substring(0, 8).toUpperCase()}`;
+
+        // Start game
+        function startGame() {
+            isPlaying = true;
+            planePosition = 0;
+            multiplier = 1.00;
+            betBtn.disabled = true;
+            cashoutBtn.disabled = false;
+            loadingOverlay.style.display = 'none';
+
+            gameInterval = setInterval(() => {
+                planePosition += 2;
+                multiplier += 0.05;
+                planeEl.style.bottom = `${planePosition}%`;
+                planeEl.style.left = `${planePosition * 2}px`;
+                multiplierEl.textContent = `x${multiplier.toFixed(2)}`;
+
+                // Random crash
+                const crashPoint = 1.2 + Math.random() * 8.8;
+                if (multiplier >= crashPoint) {
+                    crashPlane();
+                }
+            }, 100);
+        }
+
+        // Cash out
+        function cashOut() {
+            if (!isPlaying) return;
+            clearInterval(gameInterval);
+            currentBalance += Math.floor(currentBet * multiplier);
+            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            lastCrashEl.textContent = `x${multiplier.toFixed(2)}`;
+            alert(`You cashed out at x${multiplier.toFixed(2)}! +₹${Math.floor(currentBet * multiplier).toLocaleString()}`);
+            resetGame();
+        }
+
+        // Plane crashes
+        function crashPlane() {
+            clearInterval(gameInterval);
+            currentBalance -= currentBet;
+            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            lastCrashEl.textContent = `x${multiplier.toFixed(2)}`;
+            alert(`Crashed at x${multiplier.toFixed(2)}! You lost ₹${currentBet.toLocaleString()}`);
+            resetGame();
+        }
+
+        // Reset game
+        function resetGame() {
+            isPlaying = false;
+            planeEl.style.bottom = '0';
+            planeEl.style.left = '0';
+            multiplier = 1.00;
+            multiplierEl.textContent = 'x1.00';
+            betBtn.disabled = false;
+            cashoutBtn.disabled = true;
+            loadingOverlay.style.display = 'flex';
+
+            let countdown = 3;
+            nextGameEl.textContent = `${countdown}s`;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                nextGameEl.textContent = `${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        // Place bet
+        betBtn.addEventListener('click', () => {
+            const betAmount = prompt("Enter your bet amount:", "1000");
+            if (!betAmount || isNaN(betAmount) || parseInt(betAmount) <= 0) {
+                alert("Please enter a valid bet amount.");
+                return;
+            }
+            if (parseInt(betAmount) > currentBalance) {
+                alert("Insufficient balance!");
+                return;
+            }
+            currentBet = parseInt(betAmount);
+            currentBalance -= currentBet;
+            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            setTimeout(() => startGame(), 500);
+        });
+
+        // Cash out button
+        cashoutBtn.addEventListener('click', cashOut);
+
+        // Auto-start first game
+        setTimeout(() => {
+            currentBet = 1000;
+            currentBalance -= 1000;
+            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            startGame();
+        }, 2000);
+    </script>
+</body>
+</html>
