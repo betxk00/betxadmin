@@ -701,7 +701,7 @@
                 return;
             }
             currentUser = userData;
-            currentBalance = Math.floor(Math.random() * 50000) + 10000; // ₹10,000 - ₹60,000
+            currentBalance = userData.balance; // Read from localStorage
             updateBalanceDisplay();
             renderGames();
             renderLeaderboard();
@@ -718,6 +718,13 @@
             } else {
                 userBalance.textContent = "Login to Play";
                 accountId.textContent = "ID: ---";
+            }
+        }
+        // Save balance to localStorage
+        function saveBalance() {
+            if (currentUser) {
+                currentUser.balance = currentBalance;
+                localStorage.setItem('betxUser', JSON.stringify(currentUser));
             }
         }
         // Render games
