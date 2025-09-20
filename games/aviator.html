@@ -197,7 +197,7 @@
         }
 
         // Initialize game
-        let currentBalance = 50000;
+        let currentBalance = userData.balance; // Load from localStorage
         let currentBet = 0;
         let isPlaying = false;
         let planePosition = 0;
@@ -218,6 +218,13 @@
         // Display user info
         userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
         accountIdEl.textContent = `ID: ${userData.accountNumber || userData.uid.substring(0, 8).toUpperCase()}`;
+
+        // Save balance to localStorage
+        function saveBalance() {
+            userData.balance = currentBalance;
+            localStorage.setItem('betxUser', JSON.stringify(userData));
+            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+        }
 
         // Start game
         function startGame() {
@@ -248,7 +255,7 @@
             if (!isPlaying) return;
             clearInterval(gameInterval);
             currentBalance += Math.floor(currentBet * multiplier);
-            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            saveBalance(); // Save updated balance
             lastCrashEl.textContent = `x${multiplier.toFixed(2)}`;
             alert(`You cashed out at x${multiplier.toFixed(2)}! +₹${Math.floor(currentBet * multiplier).toLocaleString()}`);
             resetGame();
@@ -258,7 +265,7 @@
         function crashPlane() {
             clearInterval(gameInterval);
             currentBalance -= currentBet;
-            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            saveBalance(); // Save updated balance
             lastCrashEl.textContent = `x${multiplier.toFixed(2)}`;
             alert(`Crashed at x${multiplier.toFixed(2)}! You lost ₹${currentBet.toLocaleString()}`);
             resetGame();
@@ -300,7 +307,7 @@
             }
             currentBet = parseInt(betAmount);
             currentBalance -= currentBet;
-            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            saveBalance(); // Save updated balance
             setTimeout(() => startGame(), 500);
         });
 
@@ -311,7 +318,7 @@
         setTimeout(() => {
             currentBet = 1000;
             currentBalance -= 1000;
-            userBalanceEl.textContent = `₹${currentBalance.toLocaleString()}`;
+            saveBalance(); // Save updated balance
             startGame();
         }, 2000);
     </script>
