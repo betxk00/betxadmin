@@ -1,1 +1,543 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BETX - Mines 4x4</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #1a202c;
+  --bg-grid: #111827;
+  --box: #1e293b;
+  --green: #48bb78;
+  --gold: #ffd54a;
+  --white: #fff;
+  --gray: #aaa;
+  --red: #e53e3e;
+}
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--bg-grid);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  user-select: none;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-dark);
+  padding: 12px 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  position: relative;
+}
+.header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #333, transparent);
+}
+.logo { font-family: cursive; font-size: 20px; color: var(--white); font-weight: 600; }
+.balance { display: flex; align-items: center; gap: 6px; }
+.balance span { font-weight: 600; }
+.icons { display: flex; gap: 16px; align-items: center; }
+.icon {
+  width: 22px; height: 22px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.icon:active {
+  transform: scale(0.95);
+}
+.icon.wallet { background: #3182ce; }
+.icon.person, .icon.bell { background: #444; }
+.icon.bell { position: relative; }
+.icon.bell::after {
+  content: ""; width: 8px; height: 8px; background: #ff3b30;
+  border-radius: 50%; position: absolute; top: -2px; right: -2px;
+  box-shadow: 0 0 4px rgba(255, 59, 48, 0.6);
+}
+/* GRID */
+.grid {
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  gap: 12px;
+  padding: 12px;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.cell {
+  width: 80px; height: 80px;
+  background: var(--box);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateZ(0);
+}
+.cell::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+  border-radius: 16px;
+  z-index: 1;
+}
+.cell:hover { 
+  transform: scale(1.03) translateZ(0);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+.cell:active {
+  transform: scale(0.98) translateZ(0);
+}
+.cell.revealed { 
+  cursor: default; 
+  background: #2d3748;
+  transform: scale(1) translateZ(0);
+}
+/* Breaking animation for safe tiles */
+.cell.breaking {
+  animation: breakingAnimation 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes breakingAnimation {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  30% {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+/* Glowing diamond */
+.cell.diamond::before {
+  content: "💎";
+  font-size: 30px;
+  animation: glow 1.5s infinite alternate;
+  position: relative;
+  z-index: 2;
+}
+@keyframes glow {
+  0% { 
+    text-shadow: 0 0 4px #ffd54a, 0 0 8px #ffeb99; 
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% { 
+    text-shadow: 0 0 12px #ffd54a, 0 0 20px #ffe066; 
+    transform: scale(1);
+  }
+}
+/* Blast effect */
+.cell.bomb::before {
+  content: "💣";
+  font-size: 32px;
+  position: relative;
+  z-index: 2;
+}
+.cell.bomb::after {
+  content: "";
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 16px;
+  background: rgba(229,62,62,0.6);
+  animation: blast 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 1;
+}
+@keyframes blast {
+  0% { transform: scale(0.5); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+/* BET PANEL */
+.bet-panel {
+  margin-top: auto;
+  background: var(--bg-dark);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.label { 
+  color: var(--gray); 
+  font-size: 14px; 
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+.bet-row { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+}
+.bet-input {
+  flex: 1; 
+  padding: 12px;
+  border: none; 
+  border-radius: 10px;
+  background: #111; 
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.bet-input:focus {
+  box-shadow: 0 0 0 2px var(--gold);
+  background: #222;
+}
+.currency { 
+  color: var(--gold); 
+  font-weight: bold;
+  font-size: 18px;
+}
+.quick-btn {
+  padding: 8px 12px;
+  background: #222; 
+  border: none; 
+  border-radius: 8px;
+  color: var(--white); 
+  font-size: 14px; 
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+.quick-btn:active {
+  transform: scale(0.95);
+  background: #333;
+}
+.bet-btn {
+  width: 100%; 
+  padding: 16px;
+  border: none; 
+  border-radius: 12px;
+  background: var(--green);
+  color: var(--white); 
+  font-size: 18px; 
+  font-weight: 600;
+  cursor: pointer; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+.bet-btn:hover { 
+  background: #3da769; 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+}
+.bet-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(72, 187, 120, 0.3);
+}
+.mines-row { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+}
+.mines-select {
+  flex: 1; 
+  padding: 12px;
+  border: none; 
+  border-radius: 10px;
+  background: #111; 
+  color: var(--white);
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
+.mines-select:focus {
+  box-shadow: 0 0 0 2px var(--gold);
+  background-color: #222;
+}
+.cashout-info {
+  text-align: center; 
+  color: var(--gold);
+  font-size: 14px; 
+  font-weight: 600;
+  padding: 8px;
+  background: rgba(255, 213, 74, 0.1);
+  border-radius: 8px;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+  min-height: 20px;
+}
+/* POPUPS */
+.popup {
+  position: fixed; 
+  top: 20px; 
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  padding: 14px 24px;
+  border-radius: 14px; 
+  font-weight: 600;
+  opacity: 0; 
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+.popup.show { 
+  opacity: 1; 
+  top: 40px; 
+  transform: translateX(-50%) scale(1);
+}
+.popup.win { 
+  background: var(--green); 
+  color: #fff;
+  animation: pulseWin 2s ease-in-out;
+}
+.popup.lose { 
+  background: var(--red); 
+  color: #fff;
+  animation: shakeLose 0.6s ease-in-out;
+}
+@keyframes pulseWin {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+}
+@keyframes shakeLose {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  25% { transform: translateX(-55%) scale(0.95); }
+  75% { transform: translateX(-45%) scale(0.95); }
+}
+/* iOS-style ripple effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+/* Add subtle animation to grid */
+.grid {
+  animation: fadeInUp 0.6s ease-out;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">BetX</div>
+  <div class="balance">💰 <span id="balance">₨0.00</span> ⌄</div>
+  <div class="icons">
+    <div class="icon wallet">💳</div>
+    <div class="icon person">👤</div>
+    <div class="icon bell">🔔</div>
+  </div>
+</div>
+<!-- GAME GRID -->
+<div class="grid" id="grid"></div>
+<!-- BETTING PANEL -->
+<div class="bet-panel">
+  <div>
+    <div class="label">Bet Amount</div>
+    <div class="bet-row">
+      <input type="number" id="betAmount" class="bet-input" placeholder="0.00" min="30">
+      <span class="currency">₨</span>
+      <button class="quick-btn" onclick="halfBet()">1/2</button>
+      <button class="quick-btn" onclick="doubleBet()">2x</button>
+    </div>
+  </div>
+  <button class="bet-btn" id="betBtn">Bet</button>
+  <div class="cashout-info" id="cashoutInfo"></div>
+  <div>
+    <div class="label">Mines</div>
+    <div class="mines-row">
+      <select id="minesCount" class="mines-select">
+        <option>2</option>
+        <option>3</option>
+        <option selected>5</option>
+        <option>7</option>
+        <option>10</option>
+      </select>
+    </div>
+  </div>
+</div>
+<!-- POPUP -->
+<div id="popup" class="popup"></div>
+<script>
+const grid = document.getElementById("grid");
+let cells = [];
+let mineIndexes = [];
+let playing = false;
+let bet = 0;
+let winnings = 0;
+let multiplier = 1;
+let multiplierStep = 1.25;
+let balance = 1000; // demo balance
+let safeClicks = 0;
+function updateBalance(){
+  document.getElementById("balance").textContent = "₨" + balance.toFixed(2);
+}
+function setupGrid(){
+  grid.innerHTML = "";
+  cells=[];
+  for(let i=0;i<16;i++){ // 4x4 grid
+    const c=document.createElement("div");
+    c.className="cell";
+    c.onclick=()=>reveal(i);
+    // Add iOS-style ripple effect
+    c.addEventListener('touchstart', createRipple);
+    c.addEventListener('mousedown', createRipple);
+    grid.appendChild(c);
+    cells.push(c);
+  }
+}
+// Create iOS-style ripple effect
+function createRipple(e) {
+  if (!playing) return;
+  const button = e.currentTarget;
+  const existingRipple = button.querySelector('.ripple');
+  if (existingRipple) existingRipple.remove();
+  const ripple = document.createElement('span');
+  ripple.classList.add('ripple');
+  button.appendChild(ripple);
+  const rect = button.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const x = e.clientX - rect.left - size / 2;
+  const y = e.clientY - rect.top - size / 2;
+  ripple.style.width = ripple.style.height = `${size}px`;
+  ripple.style.left = `${x}px`;
+  ripple.style.top = `${y}px`;
+  setTimeout(() => ripple.remove(), 600);
+}
+setupGrid();
+document.getElementById("betBtn").onclick=function(){
+  if(!playing){
+    bet=parseInt(document.getElementById("betAmount").value)||0;
+    if(bet<30){ showPopup("Min bet is 30", false); return; }
+    if(bet>balance){ showPopup("Not enough balance!", false); return; }
+    balance -= bet;
+    updateBalance();
+    winnings=bet;
+    multiplier=1;
+    safeClicks=0;
+    playing=true;
+    this.textContent="Cashout";
+    let mines = parseInt(document.getElementById("minesCount").value);
+    multiplierStep = 1.2 + mines*0.05;
+    mineIndexes=[];
+    while(mineIndexes.length<mines){
+      let r=Math.floor(Math.random()*16);
+      if(!mineIndexes.includes(r)) mineIndexes.push(r);
+    }
+    document.getElementById("cashoutInfo").textContent="Multiplier: x1.00 | Win: ₨"+winnings;
+  } else {
+    balance += winnings;
+    updateBalance();
+    showPopup("You cashed out ₨"+winnings, true);
+    resetGame();
+  }
+};
+function reveal(i){
+  if(!playing) return;
+  const c=cells[i];
+  if(c.classList.contains("revealed")) return;
+  c.classList.add("revealed");
+  // Rigging logic for demo
+  if(balance >= 2500 || safeClicks >= 5){
+    lose(c);
+    return;
+  }
+  if(mineIndexes.includes(i)){
+    lose(c);
+  } else {
+    safeClicks++;
+    multiplier *= multiplierStep;
+    winnings = Math.floor(bet * multiplier);
+    // Add breaking animation before showing diamond
+    c.classList.add("breaking");
+    setTimeout(() => {
+      c.classList.add("diamond");
+      document.getElementById("cashoutInfo").textContent="Multiplier: x"+multiplier.toFixed(2)+" | Win: ₨"+winnings;
+      showPopup("✨ You found a Diamond! ₨"+winnings, true);
+    }, 600);
+  }
+}
+function lose(cell){
+  cell.classList.add("bomb");
+  showPopup("💥 You Lost! Try Again", false);
+  resetGame();
+}
+function resetGame(){
+  playing=false;
+  document.getElementById("betBtn").textContent="Bet";
+  document.getElementById("cashoutInfo").textContent="";
+  setupGrid();
+}
+function halfBet(){
+  let amt=parseInt(document.getElementById("betAmount").value)||0;
+  document.getElementById("betAmount").value=Math.floor(amt/2) || 30;
+}
+function doubleBet(){
+  let amt=parseInt(document.getElementById("betAmount").value)||0;
+  document.getElementById("betAmount").value=amt*2 || 60;
+}
+function showPopup(msg, win){
+  const popup=document.getElementById("popup");
+  popup.textContent=msg;
+  popup.className="popup show " + (win?"win":"lose");
+  setTimeout(()=>popup.classList.remove("show"),2200);
+}
+updateBalance();
+</script>
+</body>
+</html>
