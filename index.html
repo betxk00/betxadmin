@@ -1,10 +1,10 @@
-<!-- activity.html -->
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BetX - Activity</title>
+    <title>BetX - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -18,123 +18,165 @@
         body {
             background: var(--dark);
             color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: rgba(10, 10, 26, 0.9);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(0, 191, 255, 0.2);
-        }
-        .back-btn { color: var(--primary); font-size: 20px; }
-        .page-title { font-size: 20px; font-weight: 700; }
-        .main-content {
-            flex: 1;
             padding: 20px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            background-image: radial-gradient(circle at 25% 25%, rgba(0, 191, 255, 0.1) 0%, transparent 50%);
         }
-        .activity-item {
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
             background: var(--card);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #aaa;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .activity-item.deposit { border-left-color: #48bb78; }
-        .activity-item.withdrawal { border-left-color: #e53e3e; }
-        .activity-info {
-            flex: 1;
-        }
-        .activity-type {
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .activity-type.deposit { color: #48bb78; }
-        .activity-type.withdrawal { color: #e53e3e; }
-        .activity-amount { font-weight: 700; font-size: 16px; }
-        .activity-time { font-size: 12px; color: #aaa; margin-top: 5px; }
-        .no-activity {
+        .logo {
             text-align: center;
-            padding: 40px 20px;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
             color: #aaa;
         }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-around;
-            background: rgba(10, 10, 26, 0.95);
-            padding: 15px 0;
-            border-top: 1px solid rgba(0, 191, 255, 0.2);
-            z-index: 100;
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #222;
+            color: white;
+            font-size: 16px;
         }
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), #0099cc);
+            color: white;
+        }
+        .btn-secondary {
+            background: #333;
+            color: white;
+        }
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
             color: #aaa;
+        }
+        .toggle-form a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .message {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .success { background: rgba(72, 187, 120, 0.2); color: #48bb78; }
+        .error { background: rgba(229, 62, 62, 0.2); color: #e53e3e; }
+        .generated-id {
+            background: rgba(0, 191, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: var(--primary);
+            padding: 8px;
+            border-radius: 6px;
             font-size: 12px;
             cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
         }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
-    <div class="top-bar">
-        <div class="back-btn" onclick="window.history.back()">
-            <i class="fas fa-arrow-left"></i>
+    <div class="auth-container">
+        <div class="logo">BetX</div>
+
+        <!-- LOGIN FORM -->
+        <div id="loginSection">
+            <h3 style="text-align:center; margin-bottom:20px;">Login</h3>
+            <div id="loginMessage" class="message" style="display:none;"></div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <button class="btn btn-primary" id="loginBtn">Login</button>
+            <div class="toggle-form">
+                Don't have an account? <a href="#" id="showRegister">Register</a>
+            </div>
         </div>
-        <div class="page-title">Activity</div>
-        <div style="width: 24px;"></div> <!-- Spacer -->
+
+        <!-- REGISTER FORM -->
+        <div id="registerSection" style="display:none;">
+            <h3 style="text-align:center; margin-bottom:20px;">Register</h3>
+            <div id="registerMessage" class="message" style="display:none;"></div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="registerName" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Create password (min 6 chars)">
+            </div>
+            <button class="btn btn-primary" id="registerBtn">Register</button>
+            <div class="toggle-form">
+                Already have an account? <a href="#" id="showLogin">Login</a>
+            </div>
+        </div>
+
+        <!-- GENERATED ID DISPLAY (After Registration) -->
+        <div id="generatedIdSection" style="display:none;">
+            <h3 style="text-align:center; margin-bottom:15px;">🎉 Account Created!</h3>
+            <div class="generated-id" id="generatedUserId">BETX123456</div>
+            <button class="copy-btn" id="copyIdBtn">📋 Copy User ID</button>
+            <button class="btn btn-primary" id="goToHomeBtn" style="margin-top:20px;">Go to Home</button>
+        </div>
     </div>
 
-    <div class="main-content" id="activityFeed">
-        <!-- Activities will be loaded here -->
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-item" data-page="home">
-            <div class="nav-icon"><i class="fas fa-home"></i></div>
-            <div>Home</div>
-        </div>
-        <div class="nav-item active" data-page="activity">
-            <div class="nav-icon"><i class="fas fa-scroll"></i></div>
-            <div>Activity</div>
-        </div>
-        <div class="nav-item" data-page="promos">
-            <div class="nav-icon"><i class="fas fa-gift"></i></div>
-            <div>Promos</div>
-        </div>
-        <div class="nav-item" data-page="games">
-            <div class="nav-icon"><i class="fas fa-gamepad"></i></div>
-            <div>Games</div>
-        </div>
-        <div class="nav-item" data-page="profile">
-            <div class="nav-icon"><i class="fas fa-user"></i></div>
-            <div>Profile</div>
-        </div>
-    </div>
-
-    <!-- Firebase -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
     <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
             authDomain: "betx-5852a.firebaseapp.com",
@@ -145,71 +187,148 @@
             appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
             measurementId: "G-X8SD5DC9RY"
         };
+
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
-            loadActivity(user.uid);
+        // DOM Elements
+        const loginSection = document.getElementById('loginSection');
+        const registerSection = document.getElementById('registerSection');
+        const generatedIdSection = document.getElementById('generatedIdSection');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const goToHomeBtn = document.getElementById('goToHomeBtn');
+        const copyIdBtn = document.getElementById('copyIdBtn');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const registerName = document.getElementById('registerName');
+        const registerEmail = document.getElementById('registerEmail');
+        const registerPassword = document.getElementById('registerPassword');
+        const loginMessage = document.getElementById('loginMessage');
+        const registerMessage = document.getElementById('registerMessage');
+        const generatedUserId = document.getElementById('generatedUserId');
+
+        // Toggle Forms
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginSection.style.display = 'none';
+            registerSection.style.display = 'block';
+            loginMessage.style.display = 'none';
+            registerMessage.style.display = 'none';
         });
 
-        async function loadActivity(userId) {
-            const activityFeed = document.getElementById('activityFeed');
-            activityFeed.innerHTML = '<div style="text-align:center; padding:20px; color:#aaa;">Loading...</div>';
-            
-            try {
-                const snapshot = await db.collection('activities')
-                    .where('userId', '==', userId)
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .get();
-                
-                if (snapshot.empty) {
-                    activityFeed.innerHTML = '<div class="no-activity">No activity yet</div>';
-                    return;
-                }
-                
-                let html = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.timestamp?.toDate?.() || new Date();
-                    const timeStr = `${date.getDate()}/${date.getMonth()+1} ${date.getHours()}:${String(date.getMinutes()).padStart(2,'0')}`;
-                    
-                    const typeClass = data.type === 'deposit' ? 'deposit' : 'withdrawal';
-                    const typeText = data.type === 'deposit' ? 'Deposit' : 'Withdrawal';
-                    const amountText = data.type === 'deposit' ? `+${data.amount}` : `-${data.amount}`;
-                    const amountColor = data.type === 'deposit' ? '#48bb78' : '#e53e3e';
-                    
-                    html += `
-                        <div class="activity-item ${typeClass}">
-                            <div class="activity-info">
-                                <div class="activity-type ${typeClass}">${typeText}</div>
-                                <div class="activity-amount" style="color: ${amountColor}">${amountText} NPR</div>
-                                <div class="activity-time">${timeStr}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                activityFeed.innerHTML = html;
-            } catch (error) {
-                console.error("Error loading activity:", error);
-                activityFeed.innerHTML = '<div class="no-activity">Failed to load activity</div>';
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerSection.style.display = 'none';
+            loginSection.style.display = 'block';
+            loginMessage.style.display = 'none';
+            registerMessage.style.display = 'none';
+        });
+
+        // Generate User ID like BETX123456
+        function generateUserId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let id = 'BETX';
+            for (let i = 0; i < 6; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
             }
+            return id;
         }
 
-        // Bottom Nav
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.dataset.page;
-                if (page !== 'activity') {
-                    window.location.href = page === 'home' ? 'home.html' : `${page}.html`;
-                }
-            });
+        // Show Message
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'message ' + type;
+            element.style.display = 'block';
+        }
+
+        // Login
+        loginBtn.addEventListener('click', () => {
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value.trim();
+
+            if (!email || !password) {
+                showMessage(loginMessage, 'Please fill all fields', 'error');
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    showMessage(loginMessage, 'Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
+                })
+                .catch((error) => {
+                    let msg = 'Login failed. ';
+                    if (error.code === 'auth/user-not-found') msg += 'User not found.';
+                    else if (error.code === 'auth/wrong-password') msg += 'Wrong password.';
+                    else if (error.code === 'auth/invalid-email') msg += 'Invalid email.';
+                    else msg += 'Please try again.';
+                    showMessage(loginMessage, msg, 'error');
+                });
+        });
+
+        // Register
+        registerBtn.addEventListener('click', () => {
+            const name = registerName.value.trim();
+            const email = registerEmail.value.trim();
+            const password = registerPassword.value.trim();
+
+            if (!name || !email || !password) {
+                showMessage(registerMessage, 'Please fill all fields', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                showMessage(registerMessage, 'Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(async (userCredential) => {
+                    const userId = generateUserId();
+                    // Save to Firestore
+                    await db.collection('users').doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        userId: userId,
+                        balance: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Save userId in localStorage for immediate use
+                    localStorage.setItem('betx_userId', userId);
+                    generatedUserId.textContent = userId;
+                    registerSection.style.display = 'none';
+                    generatedIdSection.style.display = 'block';
+                })
+                .catch((error) => {
+                    let msg = 'Registration failed. ';
+                    if (error.code === 'auth/email-already-in-use') msg += 'Email already in use.';
+                    else if (error.code === 'auth/invalid-email') msg += 'Invalid email.';
+                    else msg += 'Please try again.';
+                    showMessage(registerMessage, msg, 'error');
+                });
+        });
+
+        // Copy User ID
+        copyIdBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(generatedUserId.textContent)
+                .then(() => {
+                    copyIdBtn.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        copyIdBtn.textContent = '📋 Copy User ID';
+                    }, 2000);
+                });
+        });
+
+        // Go to Home
+        goToHomeBtn.addEventListener('click', () => {
+            window.location.href = 'home.html';
         });
     </script>
 </body>
