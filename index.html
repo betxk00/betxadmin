@@ -646,7 +646,6 @@
                 margin-bottom: 20px;
             }
         }
-        /* Animation for form transitions */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -660,7 +659,6 @@
         .form-container.active .card {
             animation: fadeInUp 0.6s ease-out;
         }
-        /* Toast notifications */
         .toast {
             position: fixed;
             top: 20px;
@@ -812,8 +810,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+
     <script>
+        // =============================
+        // FIREBASE CONFIGURATION
+        // =============================
+        const firebaseConfig = {
+            apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
+            authDomain: "betx-5852a.firebaseapp.com",
+            projectId: "betx-5852a",
+            storageBucket: "betx-5852a.firebasestorage.app",
+            messagingSenderId: "1034960375081",
+            appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
+            measurementId: "G-X8SD5DC9RY"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // =============================
         // DOM Elements
+        // =============================
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const loginButton = document.getElementById('login-button');
@@ -832,34 +856,43 @@
         const passwordRequirements = document.querySelectorAll('#password-requirements li');
         const rememberMe = document.getElementById('remember-me');
 
-        // Form navigation
+        // =============================
+        // Form Navigation
+        // =============================
         document.getElementById('go-to-register').addEventListener('click', () => {
             loginForm.classList.remove('active');
             registerForm.classList.add('active');
         });
+
         document.getElementById('go-to-login').addEventListener('click', () => {
             registerForm.classList.remove('active');
             loginForm.classList.add('active');
         });
 
-        // Password toggle
+        // =============================
+        // Password Toggle
+        // =============================
         document.getElementById('toggle-login-password').addEventListener('click', function() {
             const type = loginPassword.type === 'password' ? 'text' : 'password';
             loginPassword.type = type;
             this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
         });
+
         document.getElementById('toggle-register-password').addEventListener('click', function() {
             const type = registerPassword.type === 'password' ? 'text' : 'password';
             registerPassword.type = type;
             this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
         });
+
         document.getElementById('toggle-confirm-password').addEventListener('click', function() {
             const type = confirmPassword.type === 'password' ? 'text' : 'password';
             confirmPassword.type = type;
             this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
         });
 
-        // Password strength
+        // =============================
+        // Password Strength Checker
+        // =============================
         function checkPasswordStrength(password) {
             const requirements = [
                 { regex: /.{8,}/, message: 'At least 8 characters' },
@@ -867,6 +900,7 @@
                 { regex: /[0-9]/, message: 'One number' },
                 { regex: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/, message: 'One special character' }
             ];
+
             let strength = 0;
             requirements.forEach((req, index) => {
                 if (req.regex.test(password)) {
@@ -880,21 +914,42 @@
                     passwordRequirements[index].innerHTML = `<i class="fas fa-times-circle"></i> ${req.message}`;
                 }
             });
-            strengthBars.forEach(bar => bar.classList.remove('weak', 'medium', 'strong'));
-            if (strength <= 1) strengthBars[0].classList.add('weak');
-            else if (strength === 2) { strengthBars[0].classList.add('weak'); strengthBars[1].classList.add('weak'); }
-            else if (strength === 3) { strengthBars[0].classList.add('medium'); strengthBars[1].classList.add('medium'); strengthBars[2].classList.add('weak'); }
-            else strengthBars.forEach(bar => bar.classList.add('strong'));
+
+            // Reset bars
+            strengthBars.forEach(bar => {
+                bar.classList.remove('weak', 'medium', 'strong');
+            });
+
+            // Update bars based on strength
+            if (strength <= 1) {
+                strengthBars[0].classList.add('weak');
+            } else if (strength === 2) {
+                strengthBars[0].classList.add('weak');
+                strengthBars[1].classList.add('weak');
+            } else if (strength === 3) {
+                strengthBars[0].classList.add('medium');
+                strengthBars[1].classList.add('medium');
+                strengthBars[2].classList.add('weak');
+            } else if (strength >= 4) {
+                strengthBars.forEach(bar => bar.classList.add('strong'));
+            }
+
             return strength >= 4;
         }
 
-        // Enable register button only when form is valid
+        // =============================
+        // Enable Register Button Only When Valid
+        // =============================
         function updateRegisterButtonState() {
             const name = registerName.value.trim();
             const email = registerEmail.value.trim();
             const password = registerPassword.value.trim();
             const confirmPass = confirmPassword.value.trim();
-            registerButton.disabled = !(name && email && password && confirmPass && password === confirmPass && checkPasswordStrength(password));
+
+            const isPasswordValid = checkPasswordStrength(password);
+            const isFormValid = name && email && password && confirmPass && password === confirmPass && isPasswordValid;
+
+            registerButton.disabled = !isFormValid;
         }
 
         // Add event listeners for real-time validation
@@ -902,56 +957,142 @@
             input.addEventListener('input', updateRegisterButtonState);
         });
 
-        // Login form submission
-        document.getElementById('login-form-content').addEventListener('submit', function(e) {
+        // =============================
+        // LOGIN FORM SUBMISSION
+        // =============================
+        document.getElementById('login-form-content').addEventListener('submit', async function(e) {
             e.preventDefault();
+
             const email = loginEmail.value.trim();
             const password = loginPassword.value.trim();
+
             if (!email || !password) {
                 document.getElementById('login-error').textContent = 'Please fill in all fields';
                 document.getElementById('login-error').classList.add('show');
                 return;
             }
-            // Generate fake user data
-            const userData = {
-                name: email.split('@')[0],
-                email: email,
-                uid: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                balance: 10000 // Starting balance ₹10,000 for all users
-            };
-            localStorage.setItem('betxUser', JSON.stringify(userData));
-            // Redirect to homepage
-            window.location.href = 'homepage.html';
+
+            try {
+                // Show loading
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging In...';
+
+                // Sign in
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Save UID for homepage
+                localStorage.setItem('betxUserUID', user.uid);
+
+                // Redirect
+                window.location.href = 'homepage.html';
+
+            } catch (error) {
+                console.error("Login Error:", error);
+
+                let errorMsg = error.message;
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMsg = 'Invalid email or password';
+                }
+
+                document.getElementById('login-error').textContent = errorMsg;
+                document.getElementById('login-error').classList.add('show');
+
+                // Reset button
+                loginButton.disabled = false;
+                loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Log In';
+            }
         });
 
-        // Register form submission
-        document.getElementById('register-form-content').addEventListener('submit', function(e) {
+        // =============================
+        // REGISTER FORM SUBMISSION
+        // =============================
+        document.getElementById('register-form-content').addEventListener('submit', async function(e) {
             e.preventDefault();
+
             const name = registerName.value.trim();
             const email = registerEmail.value.trim();
             const password = registerPassword.value.trim();
-            if (!name || !email || !password) {
+            const confirmPass = confirmPassword.value.trim();
+
+            if (!name || !email || !password || !confirmPass) {
                 document.getElementById('register-error').textContent = 'Please fill in all fields';
                 document.getElementById('register-error').classList.add('show');
                 return;
             }
-            // Generate fake user data with unique Account ID and starting balance
-            const userData = {
-                name: name,
-                email: email,
-                uid: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                accountNumber: "BX" + Math.random().toString(36).substr(2, 8).toUpperCase(),
-                balance: 10000 // Starting balance ₹10,000 for all users
-            };
-            localStorage.setItem('betxUser', JSON.stringify(userData));
-            // Redirect to homepage
-            window.location.href = 'homepage.html';
+
+            if (password !== confirmPass) {
+                document.getElementById('register-error').textContent = 'Passwords do not match';
+                document.getElementById('register-error').classList.add('show');
+                return;
+            }
+
+            if (!checkPasswordStrength(password)) {
+                document.getElementById('register-error').textContent = 'Password does not meet requirements';
+                document.getElementById('register-error').classList.add('show');
+                return;
+            }
+
+            try {
+                // Show loading
+                registerButton.disabled = true;
+                registerButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
+                // Create user in Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // Generate account number
+                const accountNumber = "BX" + Math.random().toString(36).substr(2, 8).toUpperCase();
+
+                // Save to Firestore
+                await db.collection("users").doc(user.uid).set({
+                    name: name,
+                    email: email,
+                    uid: user.uid,
+                    accountNumber: accountNumber,
+                    balance: 10000, // ₹10,000 starting balance
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Save for homepage
+                localStorage.setItem('betxUserUID', user.uid);
+
+                // Redirect
+                window.location.href = 'homepage.html';
+
+            } catch (error) {
+                console.error("Registration Error:", error);
+
+                let errorMsg = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'This email is already registered. Please log in.';
+                }
+
+                document.getElementById('register-error').textContent = errorMsg;
+                document.getElementById('register-error').classList.add('show');
+
+                // Reset button
+                registerButton.disabled = false;
+                registerButton.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+            }
         });
 
-        // Remember me toggle
+        // =============================
+        // Remember Me Toggle (Visual)
+        // =============================
         rememberMe.addEventListener('click', () => {
             rememberMe.classList.toggle('checked');
+        });
+
+        // =============================
+        // Auto-redirect if already logged in
+        // =============================
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                localStorage.setItem('betxUserUID', user.uid);
+                window.location.href = 'homepage.html';
+            }
         });
 
         // Initialize
