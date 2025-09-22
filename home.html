@@ -1,0 +1,281 @@
+<!-- home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetX - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00BFFF;
+            --secondary: #FF0066;
+            --dark: #0a0a1a;
+            --card: #1a1a2e;
+            --text: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+        }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .user-id { font-size: 14px; color: #aaa; }
+        .balance { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .section-title {
+            font-size: 20px;
+            margin: 20px 0 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 80px;
+        }
+        .game-card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .game-card:hover { transform: translateY(-5px); }
+        .game-icon { font-size: 32px; margin-bottom: 10px; }
+        .game-name { font-weight: 600; font-size: 16px; }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            background: rgba(10, 10, 26, 0.95);
+            padding: 15px 0;
+            border-top: 1px solid rgba(0, 191, 255, 0.2);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo">BetX</div>
+        <div>
+            <div class="balance" id="userBalance">Loading...</div>
+            <div class="user-id" id="userId">ID: ...</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="section-title">
+            <i class="fas fa-gamepad"></i> Games
+        </div>
+        <div class="games-grid">
+            <div class="game-card" data-game="aviator">
+                <div class="game-icon">✈️</div>
+                <div class="game-name">Aviator</div>
+            </div>
+            <div class="game-card" data-game="mines">
+                <div class="game-icon">💣</div>
+                <div class="game-name">Mines</div>
+            </div>
+            <div class="game-card" data-game="vortex">
+                <div class="game-icon">🌀</div>
+                <div class="game-name">Vortex</div>
+            </div>
+            <div class="game-card" data-game="chicken">
+                <div class="game-icon">🐔</div>
+                <div class="game-name">Chicken Run</div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <i class="fas fa-gift"></i> Promo Code
+        </div>
+        <div style="background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <input type="text" id="promoCode" placeholder="Enter promo code" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#222; color:white;">
+            <button id="applyPromo" style="width:100%; padding:12px; background:var(--primary); border:none; border-radius:8px; color:white; font-weight:600; cursor:pointer;">Apply</button>
+            <div id="promoMessage" style="margin-top:10px; padding:10px; border-radius:6px; display:none;"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="home">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div>Home</div>
+        </div>
+        <div class="nav-item" data-page="activity">
+            <div class="nav-icon"><i class="fas fa-scroll"></i></div>
+            <div>Activity</div>
+        </div>
+        <div class="nav-item" data-page="promos">
+            <div class="nav-icon"><i class="fas fa-gift"></i></div>
+            <div>Promos</div>
+        </div>
+        <div class="nav-item" data-page="games">
+            <div class="nav-icon"><i class="fas fa-gamepad"></i></div>
+            <div>Games</div>
+        </div>
+        <div class="nav-item" data-page="profile">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div>Profile</div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
+            authDomain: "betx-5852a.firebaseapp.com",
+            databaseURL: "https://betx-5852a-default-rtdb.firebaseio.com",
+            projectId: "betx-5852a",
+            storageBucket: "betx-5852a.firebasestorage.app",
+            messagingSenderId: "1034960375081",
+            appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
+            measurementId: "G-X8SD5DC9RY"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Check Auth State
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loadUserData(user);
+        });
+
+        async function loadUserData(user) {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                document.getElementById('userId').textContent = `ID: ${data.userId}`;
+                document.getElementById('userBalance').textContent = `${data.balance} NPR`;
+                localStorage.setItem('betx_balance', data.balance);
+                localStorage.setItem('betx_uid', user.uid);
+                localStorage.setItem('betx_userId', data.userId);
+            }
+        }
+
+        // Game Navigation
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const game = card.dataset.game;
+                if (game === 'aviator') {
+                    window.location.href = 'aviator.html';
+                } else if (game === 'mines') {
+                    window.location.href = 'mines.html';
+                } else {
+                    alert(`🎮 ${game.charAt(0).toUpperCase() + game.slice(1)} game coming soon!`);
+                }
+            });
+        });
+
+        // Bottom Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const page = item.dataset.page;
+                if (page === 'activity') {
+                    window.location.href = 'activity.html';
+                } else if (page === 'profile') {
+                    window.location.href = 'profile.html';
+                }
+                // Home, Promos, Games stay on this page
+            });
+        });
+
+        // Promo Code
+        document.getElementById('applyPromo').addEventListener('click', async () => {
+            const code = document.getElementById('promoCode').value.trim().toUpperCase();
+            const promoMessage = document.getElementById('promoMessage');
+            
+            if (code === 'BETXA2025') {
+                const user = auth.currentUser;
+                if (!user) return;
+                
+                const userRef = db.collection('users').doc(user.uid);
+                const doc = await userRef.get();
+                const currentBalance = doc.data().balance;
+                const newBalance = currentBalance + 100;
+                
+                await userRef.update({
+                    balance: newBalance
+                });
+                
+                // Add to activity
+                await db.collection('activities').add({
+                    userId: user.uid,
+                    type: 'deposit',
+                    amount: 100,
+                    description: 'Promo Code: BETXA2025',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                promoMessage.style.display = 'block';
+                promoMessage.style.background = 'rgba(72, 187, 120, 0.2)';
+                promoMessage.style.color = '#48bb78';
+                promoMessage.textContent = '✅ 100 NPR added to your account!';
+                document.getElementById('userBalance').textContent = `${newBalance} NPR`;
+                localStorage.setItem('betx_balance', newBalance);
+                
+                setTimeout(() => {
+                    promoMessage.style.display = 'none';
+                    document.getElementById('promoCode').value = '';
+                }, 3000);
+            } else {
+                promoMessage.style.display = 'block';
+                promoMessage.style.background = 'rgba(229, 62, 62, 0.2)';
+                promoMessage.style.color = '#e53e3e';
+                promoMessage.textContent = '❌ Invalid promo code';
+                setTimeout(() => {
+                    promoMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
