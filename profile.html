@@ -1,0 +1,417 @@
+<!-- profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetX - Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00BFFF;
+            --secondary: #FF0066;
+            --dark: #0a0a1a;
+            --card: #1a1a2e;
+            --text: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body {
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+        }
+        .back-btn { color: var(--primary); font-size: 20px; }
+        .page-title { font-size: 20px; font-weight: 700; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .profile-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 20px;
+            color: var(--dark);
+        }
+        .user-name { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .user-id { font-size: 16px; color: #aaa; margin-bottom: 20px; }
+        .balance { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 30px; }
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+        }
+        .deposit-btn {
+            background: linear-gradient(to right, #48bb78, #38a169);
+        }
+        .withdraw-btn {
+            background: linear-gradient(to right, #e53e3e, #c53030);
+        }
+        .logout-btn {
+            background: linear-gradient(to right, #e53e3e, #c53030);
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #222;
+            color: white;
+            font-size: 16px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            background: rgba(10, 10, 26, 0.95);
+            padding: 15px 0;
+            border-top: 1px solid rgba(0, 191, 255, 0.2);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #aaa;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .message {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+        .success { background: rgba(72, 187, 120, 0.2); color: #48bb78; }
+        .error { background: rgba(229, 62, 62, 0.2); color: #e53e3e; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="page-title">Profile</div>
+        <div style="width: 24px;"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="profile-card">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name" id="userName">Loading...</div>
+            <div class="user-id" id="profileUserId">ID: ...</div>
+            <div class="balance" id="profileBalance">0 NPR</div>
+            
+            <button class="action-btn deposit-btn" id="openDepositModal">+ Deposit</button>
+            <button class="action-btn withdraw-btn" id="openWithdrawModal">- Withdraw</button>
+            <button class="action-btn logout-btn" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeDepositModal">&times;</span>
+            <h3>Deposit</h3>
+            <div class="form-group">
+                <label>Amount (NPR)</label>
+                <input type="number" id="depositAmount" min="10" placeholder="Enter amount">
+            </div>
+            <button class="action-btn deposit-btn" id="confirmDeposit">Confirm Deposit</button>
+            <div class="message" id="depositMessage"></div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeWithdrawModal">&times;</span>
+            <h3>Withdraw</h3>
+            <div class="form-group">
+                <label>Amount (NPR)</label>
+                <input type="number" id="withdrawAmount" min="10" placeholder="Enter amount">
+            </div>
+            <button class="action-btn withdraw-btn" id="confirmWithdraw">Confirm Withdrawal</button>
+            <div class="message" id="withdrawMessage"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item" data-page="home">
+            <div class="nav-icon"><i class="fas fa-home"></i></div>
+            <div>Home</div>
+        </div>
+        <div class="nav-item" data-page="activity">
+            <div class="nav-icon"><i class="fas fa-scroll"></i></div>
+            <div>Activity</div>
+        </div>
+        <div class="nav-item" data-page="promos">
+            <div class="nav-icon"><i class="fas fa-gift"></i></div>
+            <div>Promos</div>
+        </div>
+        <div class="nav-item" data-page="games">
+            <div class="nav-icon"><i class="fas fa-gamepad"></i></div>
+            <div>Games</div>
+        </div>
+        <div class="nav-item active" data-page="profile">
+            <div class="nav-icon"><i class="fas fa-user"></i></div>
+            <div>Profile</div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyChhpAI9dKSinSqopaUHqwRSKxCRiwy92Q",
+            authDomain: "betx-5852a.firebaseapp.com",
+            databaseURL: "https://betx-5852a-default-rtdb.firebaseio.com",
+            projectId: "betx-5852a",
+            storageBucket: "betx-5852a.firebasestorage.app",
+            messagingSenderId: "1034960375081",
+            appId: "1:1034960375081:web:895d96c37d13e236fc7b38",
+            measurementId: "G-X8SD5DC9RY"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            currentUser = user;
+            loadProfileData();
+        });
+
+        async function loadProfileData() {
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                document.getElementById('userName').textContent = data.name || 'Player';
+                document.getElementById('profileUserId').textContent = `ID: ${data.userId}`;
+                document.getElementById('profileBalance').textContent = `${data.balance} NPR`;
+                localStorage.setItem('betx_balance', data.balance);
+            }
+        }
+
+        // Modals
+        document.getElementById('openDepositModal').addEventListener('click', () => {
+            document.getElementById('depositModal').style.display = 'flex';
+        });
+        document.getElementById('closeDepositModal').addEventListener('click', () => {
+            document.getElementById('depositModal').style.display = 'none';
+            document.getElementById('depositMessage').style.display = 'none';
+            document.getElementById('depositAmount').value = '';
+        });
+
+        document.getElementById('openWithdrawModal').addEventListener('click', () => {
+            document.getElementById('withdrawModal').style.display = 'flex';
+        });
+        document.getElementById('closeWithdrawModal').addEventListener('click', () => {
+            document.getElementById('withdrawModal').style.display = 'none';
+            document.getElementById('withdrawMessage').style.display = 'none';
+            document.getElementById('withdrawAmount').value = '';
+        });
+
+        // Deposit
+        document.getElementById('confirmDeposit').addEventListener('click', async () => {
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            const messageEl = document.getElementById('depositMessage');
+            
+            if (!amount || amount < 10) {
+                showMessage(messageEl, 'Please enter valid amount (min 10 NPR)', 'error');
+                return;
+            }
+            
+            try {
+                const userRef = db.collection('users').doc(currentUser.uid);
+                const doc = await userRef.get();
+                const currentBalance = doc.data().balance;
+                const newBalance = currentBalance + amount;
+                
+                await userRef.update({
+                    balance: newBalance
+                });
+                
+                // Add to activity
+                await db.collection('activities').add({
+                    userId: currentUser.uid,
+                    type: 'deposit',
+                    amount: amount,
+                    description: 'Manual Deposit',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage(messageEl, `✅ ${amount} NPR deposited successfully!`, 'success');
+                document.getElementById('profileBalance').textContent = `${newBalance} NPR`;
+                localStorage.setItem('betx_balance', newBalance);
+                
+                setTimeout(() => {
+                    document.getElementById('depositModal').style.display = 'none';
+                    messageEl.style.display = 'none';
+                }, 2000);
+            } catch (error) {
+                showMessage(messageEl, '❌ Deposit failed. Please try again.', 'error');
+            }
+        });
+
+        // Withdraw
+        document.getElementById('confirmWithdraw').addEventListener('click', async () => {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const messageEl = document.getElementById('withdrawMessage');
+            
+            if (!amount || amount < 10) {
+                showMessage(messageEl, 'Please enter valid amount (min 10 NPR)', 'error');
+                return;
+            }
+            
+            try {
+                const userRef = db.collection('users').doc(currentUser.uid);
+                const doc = await userRef.get();
+                const currentBalance = doc.data().balance;
+                
+                if (amount > currentBalance) {
+                    showMessage(messageEl, '❌ Insufficient balance', 'error');
+                    return;
+                }
+                
+                const newBalance = currentBalance - amount;
+                await userRef.update({
+                    balance: newBalance
+                });
+                
+                // Add to activity
+                await db.collection('activities').add({
+                    userId: currentUser.uid,
+                    type: 'withdrawal',
+                    amount: amount,
+                    description: 'Manual Withdrawal',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage(messageEl, `✅ ${amount} NPR withdrawn successfully!`, 'success');
+                document.getElementById('profileBalance').textContent = `${newBalance} NPR`;
+                localStorage.setItem('betx_balance', newBalance);
+                
+                setTimeout(() => {
+                    document.getElementById('withdrawModal').style.display = 'none';
+                    messageEl.style.display = 'none';
+                }, 2000);
+            } catch (error) {
+                showMessage(messageEl, '❌ Withdrawal failed. Please try again.', 'error');
+            }
+        });
+
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'message ' + type;
+            element.style.display = 'block';
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                localStorage.removeItem('betx_userId');
+                localStorage.removeItem('betx_balance');
+                localStorage.removeItem('betx_uid');
+                window.location.href = 'index.html';
+            });
+        });
+
+        // Bottom Nav
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page !== 'profile') {
+                    window.location.href = page === 'home' ? 'home.html' : `${page}.html`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
